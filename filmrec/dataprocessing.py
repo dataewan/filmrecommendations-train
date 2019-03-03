@@ -1,7 +1,9 @@
 import json
 from collections import Counter, namedtuple
 
-Lookups = namedtuple("Lookups", ["pairs", "top_links", "movie_to_idx", "link_to_idx"])
+Lookups = namedtuple(
+    "Lookups", ["pairs", "top_links", "movie_to_idx", "link_to_idx", "link_counts"]
+)
 Shapes = namedtuple("Shapes", ["n_movies", "n_links"])
 
 
@@ -27,7 +29,8 @@ def get_top_links(movies, N=3):
         movies (list): list containing the movie data
         N (int): cutoff value
 
-    Returns: list containing the top links only
+    Returns: list containing the top links only, also counter object for how
+        often each link happened
 
     """
     link_counts = Counter()
@@ -36,7 +39,7 @@ def get_top_links(movies, N=3):
 
     top_links = [link for link, c in link_counts.items() if c >= N]
 
-    return top_links
+    return top_links, link_counts
 
 
 def get_movie_to_idx(movies):
@@ -93,14 +96,15 @@ def form_lookups(movies):
         few times are here
     3. movie_to_idx -- lookup dict converting the movie title to number
     4. link_to_idx -- lookup dict converting the link name to number
+    5. link_counts -- how often each link happened
 
     Args:
         movies (list): list containing the json movie data
 
-    Returns: pairs, top_links, movie_to_idx, link_to_idx
+    Returns: pairs, top_links, movie_to_idx, link_to_idx, link_counts
 
     """
-    top_links = get_top_links(movies)
+    top_links, link_counts = get_top_links(movies)
     movie_to_idx = get_movie_to_idx(movies)
     link_to_idx = get_link_to_idx(top_links)
     pairs = get_pairs(movies, movie_to_idx, link_to_idx)
@@ -110,6 +114,7 @@ def form_lookups(movies):
         top_links=top_links,
         movie_to_idx=movie_to_idx,
         link_to_idx=link_to_idx,
+        link_counts=link_counts,
     )
 
 
@@ -123,7 +128,4 @@ def get_shapes(lookups):
     """
     n_movies = len(lookups.movie_to_idx)
     n_links = len(lookups.top_links)
-    return Shapes(
-        n_movies=n_movies,
-        n_links=n_links
-    )
+    return Shapes(n_movies=n_movies, n_links=n_links)
