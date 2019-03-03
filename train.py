@@ -21,3 +21,5 @@ if __name__ == "__main__":
         model = modelling.load_trained_model()
 
     recommending.write_out_prediction_objects(model, lookups)
+
+    recommending.upload_to_gcs()

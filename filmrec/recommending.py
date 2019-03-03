@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 import pickle
+from google.cloud import storage
+import os
 
 PICKLE_FILENAME = "data/pickled_model.pkl"
 
@@ -82,3 +84,12 @@ def write_out_prediction_objects(model, lookups):
         pickle.dump(output, f)
 
     return output
+
+
+def upload_to_gcs():
+    """Uploads the pickled file to gcs
+    """
+    client = storage.Client(project="filmreccommendations")
+    bucket = client.get_bucket("filmreccommendations.appspot.com")
+    blob = bucket.blob(os.path.basename(PICKLE_FILENAME))
+    blob.upload_from_filename(PICKLE_FILENAME)
