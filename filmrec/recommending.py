@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
+import pickle
 
+PICKLE_FILENAME = "data/pickled_model.pkl"
 
 def get_popular(lookups):
     """Get a measure of how popular each film is.
@@ -51,4 +53,32 @@ def get_reverse_movie_lookup(lookups):
     Returns: reversed lookup
 
     """
-    return {idx: name for name, idx in lookups.movie_to_idx}
+    return {idx: name for name, idx in lookups.movie_to_idx.items()}
+
+
+def write_out_prediction_objects(model, lookups):
+    """Write out the pickle object that contains everything we need to serve
+        lookups
+
+    Args:
+        model (keras model): trained model with the embedding weights
+        lookups (namedtuple): lookup objects
+
+    Returns: dict with the movie popularity, the neighbours and lookup to get
+        the title. This has also been written to disk.
+
+    """
+    neighbours = get_neighbours(lookups, model)
+    id_to_movie = get_reverse_movie_lookup(lookups)
+    popular_films = get_popular(lookups)
+
+    output = {
+        "neighbours": neighbours,
+        "id_to_movie": id_to_movie,
+        "popular_films": popular_films,
+    }
+
+    with open(PICKLE_FILENAME, "wb") as f:
+        pickle.dump(output, f)
+
+    return output

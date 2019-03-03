@@ -1,4 +1,4 @@
-from keras.models import Model
+from keras.models import Model, load_model
 from keras.layers import Input, Embedding, Reshape
 from keras.layers.merge import Dot
 import numpy as np
@@ -125,3 +125,11 @@ def train(model, lookups, shapes, positive_samples_per_batch, negative_ratio, ep
     model.save(MODEL_FILENAME)
 
     return model
+
+
+def load_trained_model():
+    """Loads the model from disk
+    Returns: model read from disk
+
+    """
+    return load_model(MODEL_FILENAME)

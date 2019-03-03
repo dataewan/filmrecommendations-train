@@ -1,4 +1,4 @@
-from filmrec import dataprocessing, modelling
+from filmrec import dataprocessing, modelling, recommending
 
 if __name__ == "__main__":
     positive_samples_per_batch = 512
@@ -16,3 +16,8 @@ if __name__ == "__main__":
             negative_ratio=10,
             epochs=15,
         )
+
+    else:
+        model = modelling.load_trained_model()
+
+    recommending.write_out_prediction_objects(model, lookups)
